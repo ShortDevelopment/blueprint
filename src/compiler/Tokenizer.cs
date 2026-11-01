@@ -90,19 +90,19 @@ public ref struct Tokenizer()
 
             case '(':
                 Stream.Advance(n: 1);
-                return new Token.OpenParentheses();
+                return new Token.OpenParenthesis();
 
             case ')':
                 Stream.Advance(n: 1);
-                return new Token.CloseParentheses();
+                return new Token.CloseParenthesis();
 
             case '<':
                 Stream.Advance(n: 1);
-                return new Token.Less();
+                return new Token.LessThan();
 
             case '>':
                 Stream.Advance(n: 1);
-                return new Token.Greater();
+                return new Token.GreaterThan();
 
             case '$':
                 Stream.Advance(n: 1);
@@ -289,8 +289,7 @@ public ref struct Tokenizer()
         var c = Stream.Peek();
         if (c is '0')
         {
-            c = Stream.Peek(offset: 1);
-            if (c is 'x' or 'X')
+            if (Stream.Peek(offset: 1) is 'x' or 'X')
             {
                 isHex = true;
                 Stream.Advance(n: 2);
@@ -303,11 +302,12 @@ public ref struct Tokenizer()
         scanLoop:
             while (true)
             {
+                c = Stream.Peek();
                 switch (c)
                 {
                     case '_':
                         Stream.Advance(n: 1);
-                        continue;
+                        break;
 
                     case (>= '0' and <= '9') or (>= 'a' and <= 'f') or (>= 'A' and <= 'F'):
                         Stream.Advance(n: 1);
@@ -317,7 +317,6 @@ public ref struct Tokenizer()
                     default:
                         break scanLoop;
                 }
-                c = Stream.Peek();
             }
             return new Token.Number(value);
         }
@@ -328,13 +327,13 @@ public ref struct Tokenizer()
             int fraction = 0;
             int fractionLength = 0;
         scanLoop:
-            while (true)
+            for (; ; c = Stream.Peek())
             {
                 switch (c)
                 {
                     case '_':
                         Stream.Advance(n: 1);
-                        continue;
+                        break;
 
                     case >= '0' and <= '9' when !hasSeenDecimal:
                         Stream.Advance(n: 1);
@@ -360,7 +359,6 @@ public ref struct Tokenizer()
                     default:
                         break scanLoop;
                 }
-                c = Stream.Peek();
             }
 
             return new Token.Number(value + (fraction / Math.Pow(10, fractionLength)));
@@ -381,10 +379,10 @@ public closed record Token
     public sealed record CloseBrace : Token;
     public sealed record OpenBracket : Token;
     public sealed record CloseBracket : Token;
-    public sealed record OpenParentheses : Token;
-    public sealed record CloseParentheses : Token;
-    public sealed record Less : Token;
-    public sealed record Greater : Token;
+    public sealed record OpenParenthesis : Token;
+    public sealed record CloseParenthesis : Token;
+    public sealed record LessThan : Token;
+    public sealed record GreaterThan : Token;
     public sealed record Dollar : Token;
     public sealed record Dot : Token;
     public sealed record Minus : Token;

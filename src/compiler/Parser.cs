@@ -321,16 +321,16 @@ public ref struct Parser()
         }
 
         var @string = Expect<Token.String>().Value;
-        Expect<Token.CloseParentheses>();
+        Expect<Token.CloseParenthesis>();
         return new(Value: @string, Context: context);
     }
 
     private TypeName TypeLiteral()
     {
         Expect<Token.Identifier>(static x => x.Name == "typeof");
-        Expect<Token.Less>();
+        Expect<Token.LessThan>();
         var typeName = TypeName();
-        Expect<Token.Greater>();
+        Expect<Token.GreaterThan>();
         return typeName;
     }
 
@@ -384,15 +384,15 @@ public ref struct Parser()
 
         var handler = Expect<Token.Identifier>().Name;
 
-        Expect<Token.OpenParentheses>();
+        Expect<Token.OpenParenthesis>();
 
         string? @object = null;
-        if (TryTake<Token.CloseParentheses>() is null)
+        if (TryTake<Token.CloseParenthesis>() is null)
         {
             @object = Expect<Token.Identifier>().Name;
         }
 
-        Expect<Token.CloseParentheses>();
+        Expect<Token.CloseParenthesis>();
 
         SignalFlags flags = 0;
         while (TryTake<Token.Semicolon>() is null)
