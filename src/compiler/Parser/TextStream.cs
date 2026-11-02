@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace BluePrint.Compiler;
+namespace BluePrint.Compiler.Parser;
 
 public ref struct TextStream(ReadOnlySpan<char> buffer)
 {

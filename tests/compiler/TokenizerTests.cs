@@ -1,4 +1,4 @@
-﻿using BluePrint.Compiler;
+﻿using BluePrint.Compiler.Parser;
 using TUnit.Assertions.Enums;
 
 namespace Blueprint.Compiler.Tests;

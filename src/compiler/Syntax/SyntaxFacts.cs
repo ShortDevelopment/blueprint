@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace BluePrint.Compiler;
+namespace BluePrint.Compiler.Syntax;
 
 /// <summary>
 /// Defines a set of methods to determine how Unicode characters are treated by the C# compiler.

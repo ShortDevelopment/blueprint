@@ -1,4 +1,4 @@
-﻿using BluePrint.Compiler;
+﻿using BluePrint.Compiler.Parser;
 
 var data = File.ReadAllText("test.bp");
 

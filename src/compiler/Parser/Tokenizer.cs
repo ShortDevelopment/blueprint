@@ -1,7 +1,8 @@
-﻿using System.Diagnostics;
+﻿using BluePrint.Compiler.Syntax;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace BluePrint.Compiler;
+namespace BluePrint.Compiler.Parser;
 
 public ref struct Tokenizer()
 {
