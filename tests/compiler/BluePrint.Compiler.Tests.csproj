@@ -9,7 +9,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\compiler\Blueprint.Compiler.csproj" />
+		<ProjectReference Include="..\..\src\compiler\BluePrint.Compiler.csproj" />
 	</ItemGroup>
 
 </Project>

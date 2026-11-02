@@ -3,9 +3,9 @@
     <File Path="Directory.Build.props" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/compiler/Blueprint.Compiler.csproj" />
+    <Project Path="src/compiler/BluePrint.Compiler.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/compiler/Blueprint.Compiler.Tests.csproj" />
+    <Project Path="tests/compiler/BluePrint.Compiler.Tests.csproj" />
   </Folder>
 </Solution>
