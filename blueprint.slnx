@@ -2,8 +2,13 @@
   <Folder Name="/build/">
     <File Path="Directory.Build.props" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/gtk4/SimpleGtkApp.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/compiler/BluePrint.Compiler.csproj" />
+    <Project Path="src/nuget/BluePrint.csproj" />
+    <Project Path="src/tasks/BluePrint.Compiler.Tasks.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/compiler/BluePrint.Compiler.Tests.csproj" />

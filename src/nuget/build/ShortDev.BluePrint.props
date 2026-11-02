@@ -1,0 +1,17 @@
+<Project>
+
+	<PropertyGroup>
+		<BluePrintExtension>.blp</BluePrintExtension>
+    </PropertyGroup>
+
+    <ItemDefinitionGroup>
+        <BluePrint>
+
+        </BluePrint>
+    </ItemDefinitionGroup>
+
+    <ItemGroup Condition="'$(EnableDefaultItems)' != 'false'">
+        <BluePrint Include="**/*$(BluePrintExtension)" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+    </ItemGroup>
+
+</Project>

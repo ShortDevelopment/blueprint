@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net11.0</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<IsPackable>true</IsPackable>
+		<PackageId>ShortDev.BluePrint</PackageId>
+		<PackageDescription>Compiler for the GTK blueprint markup language</PackageDescription>
+		<Authors>ShortDevelopment</Authors>
+		<RepositoryUrl>https://github.com/ShortDevelopment/blueprint</RepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="../../README.md" Pack="true" PackagePath="/" />
+		<Content Include="build\*" Pack="true" PackagePath="build/" />
+		<ProjectReference Include="..\tasks\BluePrint.Compiler.Tasks.csproj" PrivateAssets="all" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<TargetsForTfmSpecificBuildOutput>
+			$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage
+		</TargetsForTfmSpecificBuildOutput>
+	</PropertyGroup>
+
+	<Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+		<ItemGroup>
+			<None Include="@(ReferenceCopyLocalPaths)" Pack="true" PackagePath="tasks\$(TargetFramework)\%(ReferenceCopyLocalPaths.FileName)%(ReferenceCopyLocalPaths.Extension)" />
+		</ItemGroup>
+	</Target>
+
+</Project>
