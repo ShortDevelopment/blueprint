@@ -1,23 +1,17 @@
-﻿using BluePrint.Compiler.Parser;
+﻿using BluePrint.Compiler.CodeGen;
+using BluePrint.Compiler.Parser;
+using System.Xml;
 
-var data = File.ReadAllText("test.bp");
-
+if (args is not [var sourceFile])
 {
-    Tokenizer tokenizer = new()
-    {
-        Stream = new(data),
-    };
-    while (tokenizer.Next() is var token and not Token.EOF)
-    {
-        Console.WriteLine(token);
-    }
+    Console.WriteLine("Usage: blueprint <source-file>");
+    return;
 }
 
-Parser parser = new()
-{
-    Tokenizer = new()
-    {
-        Stream = new(data)
-    }
-};
-Console.WriteLine(parser.Parse());
+var source = File.ReadAllText(sourceFile);
+
+Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+using var writer = XmlWriter.Create(Console.Out);
+using XmlCodeGenerator generator = new(writer);
+generator.Visit(Parser.Parse(source));
