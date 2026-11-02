@@ -349,7 +349,7 @@ public ref struct Tokenizer()
                         break;
 
                     case '.' when hasSeenDecimal:
-                        throw new UnexpectedTokenException(actual: c);
+                        break scanLoop;
 
                     case '.':
                         Stream.Advance(n: 1);

@@ -253,6 +253,19 @@ public class TokenizerTests
         );
 
     [Test]
+    public async Task IntegerMultipleDots()
+        => await AssertTokenize(
+            $"""1..2 3..4 5""",
+            new Token.Number(1),
+            new Token.Dot(),
+            new Token.Number(2),
+            new Token.Number(3),
+            new Token.Dot(),
+            new Token.Number(4),
+            new Token.Number(5)
+        );
+
+    [Test]
     public async Task Double()
         => await AssertTokenize(
             $"""1.2 3.4 5""",
