@@ -266,7 +266,7 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
 
     private void VisitMenuSubMenu(MenuSubMenu subMenu)
     {
-        _writer.WriteStartElement("section");
+        _writer.WriteStartElement("submenu");
         {
             if (subMenu.Id is { } id)
                 _writer.WriteAttributeString("id", id);
