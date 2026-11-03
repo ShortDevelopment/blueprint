@@ -3,7 +3,7 @@
 namespace BluePrint.Compiler.Syntax;
 
 [DebuggerDisplay($"{{{nameof(Value)}}}")]
-public readonly union PropertyValue(Menu, ObjectLiteral, Translated, Flags, TypeName, StringLiteral, Number, Bool, Null, Identifier)
+public readonly union PropertyValue(Binding, Expression, Menu, ObjectLiteral, Translated, Flags, TypeName, StringLiteral, Number, Bool, Null, Identifier)
 {
     public override string ToString() => Value?.ToString() ?? "null";
 }

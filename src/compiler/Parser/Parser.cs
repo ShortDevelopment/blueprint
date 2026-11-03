@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace BluePrint.Compiler.Parser;
 
-public ref struct Parser()
+public ref partial struct Parser()
 {
     public required Tokenizer Tokenizer;
 
@@ -283,9 +283,9 @@ public ref struct Parser()
         PropertyValue value = Tokenizer.Peek() switch
         {
             // Binding
-            Token.Identifier { Name: "bind" } => throw new NotImplementedException(),
+            Token.Identifier { Name: "bind" } => Binding(),
             // ExprValue
-            Token.Identifier { Name: "expr" } => throw new NotImplementedException(),
+            Token.Identifier { Name: "expr" } => ExprValue(),
             // Menu
             Token.Identifier { Name: "menu" } => Menu(),
 
@@ -306,6 +306,32 @@ public ref struct Parser()
         Expect<Token.Semicolon>();
 
         return new Property(Name: id, Value: value);
+    }
+
+    private Binding Binding()
+    {
+        Expect<Token.Identifier>(static x => x.Name == "bind");
+
+        var expression = Expression();
+
+        BindingFlags flags = default;
+        while (Tokenizer.Peek() is Token.Identifier)
+        {
+            flags |= Expect<Token.Identifier>() switch
+            {
+                { Name: "inverted" } => BindingFlags.Inverted,
+                { Name: "bidirectional" } => BindingFlags.Bidirectional,
+                { Name: "no-sync-create" } => BindingFlags.NoSyncCreate,
+                { Name: var token } => throw new SyntaxError($"Invalid binding flag '{token}'"),
+            };
+        }
+        return new(expression, flags);
+    }
+
+    private Expression ExprValue()
+    {
+        Expect<Token.Identifier>(static x => x.Name == "expr");
+        return Expression();
     }
 
     private Translated Translated()
@@ -396,7 +422,7 @@ public ref struct Parser()
         Expect<Token.CloseParenthesis>();
 
         SignalFlags flags = 0;
-        while (TryTake<Token.Semicolon>() is null)
+        while (Tokenizer.Peek() is Token.Identifier)
         {
             flags |= Expect<Token.Identifier>() switch
             {

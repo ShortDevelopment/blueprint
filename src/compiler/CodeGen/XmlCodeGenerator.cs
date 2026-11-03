@@ -107,7 +107,7 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
 
     private void VisitProperty(Property property)
     {
-        _writer.WriteStartElement("property");
+        _writer.WriteStartElement(property.Value is Binding ? "binding" : "property");
         {
             _writer.WriteAttributeString("name", property.Name);
 
@@ -119,6 +119,16 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
 
             switch (property.Value)
             {
+                case Binding binding:
+                    if (binding.Flags != 0)
+                        throw new NotImplementedException();
+                    VisitExpression(binding.Expression);
+                    break;
+
+                case Expression expression:
+                    VisitExpression(expression);
+                    break;
+
                 case Menu menu:
                     VisitMenu(menu);
                     break;
@@ -164,6 +174,11 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
             }
         }
         _writer.WriteEndElement();
+    }
+
+    private void VisitExpression(Expression expression)
+    {
+        throw new NotImplementedException();
     }
 
     private void VisitSignal(Signal signal)
