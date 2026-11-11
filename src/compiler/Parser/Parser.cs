@@ -294,9 +294,6 @@ public ref partial struct Parser()
 
             // Literals
             Token.Identifier { Name: "typeof" } => TypeLiteral(),
-            Token.Identifier { Name: "true" } => Expect<Token.Identifier>().let(_ => new Bool(true)),
-            Token.Identifier { Name: "false" } => Expect<Token.Identifier>().let(_ => new Bool(false)),
-            Token.Identifier { Name: "null" } => Expect<Token.Identifier>().let(_ => new Null()),
             Token.String => Expect<Token.String>().let(s => new StringLiteral(s.Value)),
             Token.Number or Token.Minus or Token.Plus => NumberLiteral(),
 
@@ -391,10 +388,10 @@ public ref partial struct Parser()
 
     private Flags Flags()
     {
-        List<string> values = [];
+        List<Identifier> values = [];
         do
         {
-            values.Add(Expect<Token.Identifier>().Name);
+            values.Add(new Identifier(Expect<Token.Identifier>().Name));
         } while (TryTake<Token.Pipe>() is { });
         return new(values);
     }

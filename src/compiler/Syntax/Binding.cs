@@ -1,6 +1,15 @@
 ﻿namespace BluePrint.Compiler.Syntax;
 
-public sealed record Binding(Expression Expression, BindingFlags Flags);
+public sealed record Binding(Expression Expression, BindingFlags Flags) : ISyntaxVisitable
+{
+    public void Visit(ISyntaxVisitor visitor)
+        => visitor.VisitBinding(this);
+
+    public void VisitChildren(ISyntaxVisitor visitor)
+    {
+        Expression.Visit(visitor);
+    }
+}
 
 [Flags]
 public enum BindingFlags

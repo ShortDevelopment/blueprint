@@ -157,14 +157,6 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                     _writer.WriteString(number.Value.ToString(CultureInfo.InvariantCulture));
                     break;
 
-                case Bool boolean:
-                    _writer.WriteString(boolean.Value ? "true" : "false");
-                    break;
-
-                case Null:
-                    _writer.WriteString("null");
-                    break;
-
                 case Identifier id:
                     _writer.WriteString(id.Value);
                     break;
