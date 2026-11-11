@@ -142,7 +142,7 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                     break;
 
                 case Flags flags:
-                    _writer.WriteString(string.Join('|', flags.Values));
+                    _writer.WriteString(string.Join('|', flags.Values.Select(x => x.Value)));
                     break;
 
                 case TypeName typeName:
