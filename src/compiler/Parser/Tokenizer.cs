@@ -41,13 +41,8 @@ public ref struct Tokenizer()
 
     private Token ScanNext()
     {
+        SkipTrivia();
         var c = Stream.Peek();
-        while (c != null && char.IsWhiteSpace(c.Value))
-        {
-            Stream.Advance(n: 1);
-            c = Stream.Peek();
-        }
-
         switch (c)
         {
             case null:
@@ -145,18 +140,46 @@ public ref struct Tokenizer()
             case >= '0' and <= '9':
                 return ScanNumericLiteral();
 
-            case '/':
-                Stream.Advance(n: 1);
-                switch (Stream.Peek())
-                {
-                    case '/':
-                    case '*':
-                        throw new NotImplementedException();
-                }
-                throw new UnexpectedTokenException(actual: c);
-
             default:
                 throw new UnexpectedTokenException(actual: c);
+        }
+    }
+
+    private void SkipTrivia()
+    {
+        while (true)
+        {
+            switch (Stream.Peek())
+            {
+                case { } c when SyntaxFacts.IsWhiteSpace(c):
+                    Stream.Advance();
+                    break;
+
+                case '/' when Stream.Peek(offset: 1) is '/':
+                    Stream.Advance(n: 2);
+                    while (Stream.Peek() is { } next && !SyntaxFacts.IsNewLine(next))
+                        Stream.Advance();
+                    break;
+
+                case '/' when Stream.Peek(offset: 1) is '*':
+                    SkipBlockComment(ref Stream);
+                    break;
+
+                default:
+                    return;
+            }
+        }
+
+        static void SkipBlockComment(ref TextStream stream)
+        {
+            stream.Advance(n: 2);
+            while (stream.Pop() is { } c)
+            {
+                if (c == '*' && stream.TryAdvance('/'))
+                    return;
+            }
+
+            throw new SyntaxError("Unterminated block comment");
         }
     }
 
@@ -183,7 +206,7 @@ public ref struct Tokenizer()
                 Stream.Advance(n: 1);
                 break;
             }
-            else if (c is '\r' or '\n' or null)
+            else if (c is null || SyntaxFacts.IsNewLine(c.Value))
                 throw new UnexpectedTokenException(actual: c);
             else
             {

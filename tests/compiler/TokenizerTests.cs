@@ -337,6 +337,45 @@ public class TokenizerTests
             new Token.Identifier("_123")
         );
 
+    [Test]
+    public Task SingleLineComment_CR() => AssertSingleLineComment("\r");
+
+    [Test]
+    public Task SingleLineComment_LF() => AssertSingleLineComment("\n");
+
+    [Test]
+    public Task SingleLineComment_CRLF() => AssertSingleLineComment("\r\n");
+
+    [Test]
+    public Task MultiLineComment_CR() => AssertMultiLineComment("\r");
+
+    [Test]
+    public Task MultiLineComment_LF() => AssertMultiLineComment("\n");
+
+    [Test]
+    public Task MultiLineComment_CRLF() => AssertMultiLineComment("\r\n");
+
+    [Test]
+    public async Task CommentMarkers_InsideStringsArePreserved()
+        => await AssertTokenize(
+            """ "https://example.com/*path*/" """,
+            new Token.String("https://example.com/*path*/")
+        );
+
+    private static Task AssertSingleLineComment(string lineEnding)
+        => AssertTokenize(
+            $"alpha// comment{lineEnding}beta// EOF",
+            new Token.Identifier("alpha"),
+            new Token.Identifier("beta")
+        );
+
+    private static Task AssertMultiLineComment(string lineEnding)
+        => AssertTokenize(
+            $"alpha/**//* first line{lineEnding}second line */beta",
+            new Token.Identifier("alpha"),
+            new Token.Identifier("beta")
+        );
+
     private static async Task AssertTokenize(string source, params Token[] expectedTokens)
     {
         var tokenizer = Tokenizer(source);

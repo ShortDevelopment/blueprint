@@ -3,7 +3,7 @@
 namespace BluePrint.Compiler.Syntax;
 
 /// <summary>
-/// Defines a set of methods to determine how Unicode characters are treated by the C# compiler.
+/// Defines a set of methods to determine how Unicode characters are treated by the Blueprint compiler.
 /// </summary>
 internal static class SyntaxFacts
 {
@@ -28,4 +28,17 @@ internal static class SyntaxFacts
         Debug.Assert(IsHexDigit(c));
         return (c >= '0' && c <= '9') ? c - '0' : (c & 0xdf) - 'A' + 10;
     }
+
+    /// <summary>
+    /// Returns true if the Unicode character represents a whitespace.
+    /// </summary>
+    /// <param name="ch">The Unicode character.</param>
+    internal static bool IsWhiteSpace(char c)
+        => char.IsWhiteSpace(c);
+
+    /// <summary>
+    /// Returns true if the Unicode character is a newline character.
+    /// </summary>
+    /// <param name="c">The Unicode character.</param>
+    internal static bool IsNewLine(char c) => c is '\r' or '\n';
 }
