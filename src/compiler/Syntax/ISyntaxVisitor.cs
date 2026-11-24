@@ -2,97 +2,82 @@
 
 public interface ISyntaxVisitor
 {
+    void VisitDefault<T>(T element) where T : ISyntaxVisitable;
+
     void VisitDocument(Document document)
-        => document.VisitChildren(this);
+        => VisitDefault(document);
 
     void VisitUsing(Using @using)
-        => @using.VisitChildren(this);
+        => VisitDefault(@using);
 
 
     void VisitTemplate(Template template)
-        => template.VisitChildren(this);
+        => VisitDefault(template);
 
     void VisitObject(ObjectLiteral @object)
-        => @object.VisitChildren(this);
+        => VisitDefault(@object);
 
 
     void VisitChild(Child child)
-        => child.VisitChildren(this);
+        => VisitDefault(child);
 
     void VisitProperty(Property property)
-        => property.VisitChildren(this);
+        => VisitDefault(property);
 
     void VisitSignal(Signal signal)
-        => signal.VisitChildren(this);
+        => VisitDefault(signal);
 
     void VisitBinding(Binding binding)
-        => binding.VisitChildren(this);
+        => VisitDefault(binding);
 
 
     void VisitMenu(Menu menu)
-        => menu.VisitChildren(this);
+        => VisitDefault(menu);
 
-    void VisitMenuChild(MenuChild child)
-    {
-        switch (child)
-        {
-            case MenuItem item:
-                VisitMenuItem(item);
-                break;
-
-            case MenuSection section:
-                VisitMenuSection(section);
-                break;
-
-            case MenuSubMenu subMenu:
-                VisitMenuSubMenu(subMenu);
-                break;
-        }
-    }
 
     void VisitMenuItem(MenuItem item)
-        => item.VisitChildren(this);
+        => VisitDefault(item);
 
     void VisitMenuSection(MenuSection section)
-        => section.VisitChildren(this);
+        => VisitDefault(section);
 
     void VisitMenuSubMenu(MenuSubMenu subMenu)
-        => subMenu.VisitChildren(this);
+        => VisitDefault(subMenu);
 
     void VisitMenuAttribute(MenuAttribute attribute)
-        => attribute.VisitChildren(this);
+        => VisitDefault(attribute);
 
 
     void VisitTryExpression(TryExpression expression)
-        => expression.VisitChildren(this);
+        => VisitDefault(expression);
 
     void VisitClosureExpression(ClosureExpression expression)
-        => expression.VisitChildren(this);
+        => VisitDefault(expression);
 
     void VisitLookupExpression(LookupExpression expression)
-        => expression.VisitChildren(this);
+        => VisitDefault(expression);
 
     void VisitCastExpression(CastExpression expression)
-        => expression.VisitChildren(this);
+        => VisitDefault(expression);
 
 
     void VisitTypeName(TypeName typeName)
-        => typeName.VisitChildren(this);
+        => VisitDefault(typeName);
 
     void VisitFlags(Flags flags)
-        => flags.VisitChildren(this);
+        => VisitDefault(flags);
 
     void VisitTranslated(Translated translated)
-        => translated.VisitChildren(this);
+        => VisitDefault(translated);
 
     void VisitIdentifier(Identifier identifier)
-        => identifier.VisitChildren(this);
+        => VisitDefault(identifier);
 
     void VisitNumber(Number number)
-        => number.VisitChildren(this);
+        => VisitDefault(number);
 
     void VisitString(StringLiteral @string)
-        => @string.VisitChildren(this);
+        => VisitDefault(@string);
 }
 
 public interface ISyntaxVisitable

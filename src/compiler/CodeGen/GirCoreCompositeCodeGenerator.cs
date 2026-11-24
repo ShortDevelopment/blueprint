@@ -86,6 +86,9 @@ public sealed class GirCoreCompositeCodeGenerator(TextWriter writer) : IDisposab
 
 file sealed class TemplateVisitor(Action<Template> action) : ISyntaxVisitor
 {
+    void ISyntaxVisitor.VisitDefault<T>(T element)
+        => element.VisitChildren(this);
+
     void ISyntaxVisitor.VisitTemplate(Template template) => action(template);
 
     public static void Visit(Document document, Action<Template> action)
@@ -97,6 +100,9 @@ file sealed class TemplateVisitor(Action<Template> action) : ISyntaxVisitor
 
 file sealed class ObjectLiteralVisitor(Action<ObjectLiteral> action) : ISyntaxVisitor
 {
+    void ISyntaxVisitor.VisitDefault<T>(T element)
+        => element.VisitChildren(this);
+
     void ISyntaxVisitor.VisitObject(ObjectLiteral @object) => action(@object);
 
     public static void Visit(Template template, Action<ObjectLiteral> action)

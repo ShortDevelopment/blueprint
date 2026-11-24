@@ -4,11 +4,17 @@ using System.Xml;
 
 namespace BluePrint.Compiler.CodeGen;
 
-public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
+public sealed class XmlCodeGenerator(XmlWriter writer) : ISyntaxVisitor, IDisposable
 {
     private readonly XmlWriter _writer = writer;
 
+    void ISyntaxVisitor.VisitDefault<T>(T element)
+        => throw new NotImplementedException();
+
     public void Visit(Document document)
+        => document.Visit(this);
+
+    void ISyntaxVisitor.VisitDocument(Document document)
     {
         _writer.WriteStartDocument();
         {
@@ -18,43 +24,22 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                 _writer.WriteAttributeString("domain", translationDomain);
 
             foreach (var @using in document.Usings)
-                VisitUsing(@using);
+                @using.Visit(this);
 
             foreach (var element in document.Elements)
-                VisitElement(element);
+                element.Visit(this);
 
             _writer.WriteEndElement();
         }
         _writer.WriteEndDocument();
     }
 
-    private void VisitUsing(Using @using)
+    void ISyntaxVisitor.VisitUsing(Using @using)
     {
         // TODO
     }
 
-    private void VisitElement(Element element)
-    {
-        switch (element)
-        {
-            case ObjectLiteral @object:
-                VisitObject(@object);
-                break;
-
-            case Template template:
-                VisitTemplate(template);
-                break;
-
-            case Menu menu:
-                VisitMenu(menu);
-                break;
-
-            default:
-                throw new NotImplementedException();
-        }
-    }
-
-    private void VisitObject(ObjectLiteral @object)
+    void ISyntaxVisitor.VisitObject(ObjectLiteral @object)
     {
         _writer.WriteStartElement("object");
         {
@@ -64,12 +49,12 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                 _writer.WriteAttributeString("id", id);
 
             foreach (var element in @object.Content)
-                VisitObjectContentElement(element);
+                element.Visit(this);
         }
         _writer.WriteEndElement();
     }
 
-    private void VisitTemplate(Template template)
+    void ISyntaxVisitor.VisitTemplate(Template template)
     {
         _writer.WriteStartElement("template");
         {
@@ -79,33 +64,12 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                 _writer.WriteAttributeString("parent", Format(parent));
 
             foreach (var element in template.Content)
-                VisitObjectContentElement(element);
+                element.Visit(this);
         }
         _writer.WriteEndElement();
     }
 
-    private void VisitObjectContentElement(ObjectContentElements element)
-    {
-        switch (element)
-        {
-            case Property property:
-                VisitProperty(property);
-                break;
-
-            case Signal signal:
-                VisitSignal(signal);
-                break;
-
-            case Child child:
-                VisitChild(child);
-                break;
-
-            default:
-                throw new NotImplementedException();
-        }
-    }
-
-    private void VisitProperty(Property property)
+    void ISyntaxVisitor.VisitProperty(Property property)
     {
         _writer.WriteStartElement(property.Value is Binding ? "binding" : "property");
         {
@@ -122,19 +86,19 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                 case Binding binding:
                     if (binding.Flags != 0)
                         throw new NotImplementedException();
-                    VisitExpression(binding.Expression);
+                    binding.Expression.Visit(this);
                     break;
 
                 case Expression expression:
-                    VisitExpression(expression);
+                    expression.Visit(this);
                     break;
 
                 case Menu menu:
-                    VisitMenu(menu);
+                    menu.Visit(this);
                     break;
 
                 case ObjectLiteral @object:
-                    VisitObject(@object);
+                    @object.Visit(this);
                     break;
 
                 case Translated translated:
@@ -168,15 +132,10 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
         _writer.WriteEndElement();
     }
 
-    private void VisitExpression(Expression expression)
-    {
-        throw new NotImplementedException();
-    }
+    void ISyntaxVisitor.VisitSignal(Signal signal)
+       => throw new NotImplementedException();
 
-    private void VisitSignal(Signal signal)
-        => throw new NotImplementedException();
-
-    private void VisitChild(Child child)
+    void ISyntaxVisitor.VisitChild(Child child)
     {
         _writer.WriteStartElement("child");
         {
@@ -188,12 +147,12 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                     _writer.WriteAttributeString("type", annotation.ChildType);
             }
 
-            VisitObject(child.Value);
+            child.Value.Visit(this);
         }
         _writer.WriteEndElement();
     }
 
-    private void VisitMenu(Menu menu)
+    void ISyntaxVisitor.VisitMenu(Menu menu)
     {
         _writer.WriteStartElement("menu");
         {
@@ -201,40 +160,22 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                 _writer.WriteAttributeString("id", id);
 
             foreach (var child in menu.Children)
-                VisitMenuChild(child);
+                child.Visit(this);
         }
         _writer.WriteEndElement();
     }
 
-    private void VisitMenuChild(MenuChild child)
-    {
-        switch (child)
-        {
-            case MenuItem item:
-                VisitMenuItem(item);
-                break;
-
-            case MenuSection section:
-                VisitMenuSection(section);
-                break;
-
-            case MenuSubMenu subMenu:
-                VisitMenuSubMenu(subMenu);
-                break;
-        }
-    }
-
-    private void VisitMenuItem(MenuItem item)
+    void ISyntaxVisitor.VisitMenuItem(MenuItem item)
     {
         _writer.WriteStartElement("item");
         {
             foreach (var attribute in item.Attributes)
-                VisitMenuAttribute(attribute);
+                attribute.Visit(this);
         }
         _writer.WriteEndElement();
     }
 
-    private void VisitMenuAttribute(MenuAttribute attribute)
+    void ISyntaxVisitor.VisitMenuAttribute(MenuAttribute attribute)
     {
         _writer.WriteStartElement("attribute");
         {
@@ -255,7 +196,7 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
         _writer.WriteEndElement();
     }
 
-    private void VisitMenuSection(MenuSection section)
+    void ISyntaxVisitor.VisitMenuSection(MenuSection section)
     {
         _writer.WriteStartElement("section");
         {
@@ -263,15 +204,15 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                 _writer.WriteAttributeString("id", id);
 
             foreach (var attribute in section.Attributes)
-                VisitMenuAttribute(attribute);
+                attribute.Visit(this);
 
             foreach (var child in section.Children)
-                VisitMenuChild(child);
+                child.Visit(this);
         }
         _writer.WriteEndElement();
     }
 
-    private void VisitMenuSubMenu(MenuSubMenu subMenu)
+    void ISyntaxVisitor.VisitMenuSubMenu(MenuSubMenu subMenu)
     {
         _writer.WriteStartElement("submenu");
         {
@@ -279,10 +220,10 @@ public sealed class XmlCodeGenerator(XmlWriter writer) : IDisposable
                 _writer.WriteAttributeString("id", id);
 
             foreach (var attribute in subMenu.Attributes)
-                VisitMenuAttribute(attribute);
+                attribute.Visit(this);
 
             foreach (var child in subMenu.Children)
-                VisitMenuChild(child);
+                child.Visit(this);
         }
         _writer.WriteEndElement();
     }
