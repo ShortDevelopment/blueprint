@@ -5,18 +5,24 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<_BluePrintBuildTasksTfm Condition="'$(MSBuildRuntimeType)' == 'Core'">net11.0</_BluePrintBuildTasksTfm>
-		<_BluePrintBuildTasksTfm Condition="'$(MSBuildRuntimeType)' != 'Core'">net472</_BluePrintBuildTasksTfm>
+		<_BluePrintBuildTasksTfm>net11.0</_BluePrintBuildTasksTfm>
 		<_BluePrintBuildTasksAssembly Condition="'$(_BluePrintBuildTasksAssembly)'==''">$([MSBuild]::Unescape($([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\tasks\$(_BluePrintBuildTasksTfm)\BluePrint.Compiler.Tasks.dll'))))</_BluePrintBuildTasksAssembly>
 	</PropertyGroup>
 
-	<UsingTask TaskName="BluePrint.Compiler.Tasks.CompileBluePrint" AssemblyFile="$(_BluePrintBuildTasksAssembly)"/>
+	<UsingTask TaskName="BluePrint.Compiler.Tasks.CompileBluePrint" AssemblyFile="$(_BluePrintBuildTasksAssembly)" Condition="'$(MSBuildRuntimeType)' == 'Core'" />
+	<UsingTask TaskName="BluePrint.Compiler.Tasks.CompileBluePrint" AssemblyFile="$(_BluePrintBuildTasksAssembly)" Runtime="NET" TaskFactory="TaskHostFactory" Condition="'$(MSBuildRuntimeType)' != 'Core'" />
 
 	<PropertyGroup>
 		<PrepareResourcesDependsOn>
 			CompileBluePrint;
 			$(PrepareResourcesDependsOn)
 		</PrepareResourcesDependsOn>
+
+		<!-- Support design-time builds for IntelliSense -->
+		<CoreCompileDependsOn Condition="'$(BuildingProject)' != 'true' Or '$(DesignTimeBuild)' == 'true'">
+			CompileBluePrint;
+			$(CoreCompileDependsOn)
+		</CoreCompileDependsOn>
 	</PropertyGroup>
 
 	<Target Name="CompileBluePrint">
