@@ -28,10 +28,12 @@
                 OutputPath="$(IntermediateOutputPath)">
 
 			<Output ItemName="GeneratedGtkXml" TaskParameter="GeneratedFiles"/>
+			<Output ItemName="Compile" TaskParameter="GeneratedCodeFiles"/>
 
 		</CompileBluePrint>
 
 		<Message Text="(out) GeneratedGtkXml: '@(GeneratedGtkXml)'" Condition=" '$(MSBuildTargetsVerbose)' == 'true' "/>
+		<Message Text="(out) GeneratedGtkCode: '@(Compile)'" Condition=" '$(MSBuildTargetsVerbose)' == 'true' "/>
 
 		<ItemGroup>
 			<EmbeddedResource Include="@(GeneratedGtkXml)"/>

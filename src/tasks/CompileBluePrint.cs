@@ -11,6 +11,8 @@ public sealed class CompileBluePrint : Task
 {
     const string BluePrintExtension = ".bp";
     const string UIXmlExtension = ".ui";
+    const string CSharpExtension = ".cs";
+    const string GeneratedCSharpExtension = $".g{CSharpExtension}";
 
     [Required]
     public ITaskItem[] Inputs { get; set; } = [];
@@ -20,6 +22,9 @@ public sealed class CompileBluePrint : Task
 
     [Output]
     public ITaskItem[]? GeneratedFiles { get; private set; }
+
+    [Output]
+    public ITaskItem[]? GeneratedCodeFiles { get; private set; }
 
     public override bool Execute()
     {
@@ -33,7 +38,7 @@ public sealed class CompileBluePrint : Task
         }
 
         bool success = true;
-        List<ITaskItem> generatedFiles = [];
+        List<ITaskItem> generatedFiles = [], generatedCodeFiles = [];
 
         foreach (var input in inputs)
         {
@@ -48,14 +53,26 @@ public sealed class CompileBluePrint : Task
                     Indent = false
                 };
 
-                var fullOutputPath = CreatePathFor(input, outputPath, out var logicalName);
-                using (var xmlWriter = XmlWriter.Create(fullOutputPath, settings))
-                using (XmlCodeGenerator generator = new(xmlWriter))
+                string logicalNameXml;
                 {
-                    generator.Visit(document);
+                    var fullOutputPath = CreatePathFor(input, outputPath, extension: UIXmlExtension, out logicalNameXml);
+                    using (var xmlWriter = XmlWriter.Create(fullOutputPath, settings))
+                    using (XmlCodeGenerator generator = new(xmlWriter))
+                    {
+                        generator.Visit(document);
+                    }
+                    generatedFiles.Add(CreateOutputItem(fullOutputPath, input, logicalNameXml));
                 }
 
-                generatedFiles.Add(CreateOutputItem(fullOutputPath, input, logicalName));
+                {
+                    var fullOutputPath = CreatePathFor(input, outputPath, extension: GeneratedCSharpExtension, out var logicalNameCode);
+                    using (StreamWriter writer = new(fullOutputPath, append: false, encoding: Encoding.UTF8))
+                    using (GirCoreCompositeCodeGenerator generator = new(writer))
+                    {
+                        generator.Visit(document, logicalNameXml);
+                    }
+                    generatedCodeFiles.Add(CreateOutputItem(fullOutputPath, input, logicalNameCode));
+                }
             }
             catch (Exception exception)
             {
@@ -65,21 +82,22 @@ public sealed class CompileBluePrint : Task
         }
 
         GeneratedFiles = [.. generatedFiles];
+        GeneratedCodeFiles = [.. generatedCodeFiles];
         return success;
     }
 
-    private string CreatePathFor(ITaskItem item, string outputPath, out string logicalName)
+    private static string CreatePathFor(ITaskItem item, string outputPath, string extension, out string logicalName)
     {
         string path = item.ItemSpec;
 
         var sourceDir = Directory.GetCurrentDirectory();
         path = Path.GetRelativePath(sourceDir, Path.GetFullPath(path, sourceDir));
-        logicalName = Path.ChangeExtension(path, UIXmlExtension)
+        logicalName = Path.ChangeExtension(path, extension)
             .Replace(Path.DirectorySeparatorChar, '.')
             .Replace(Path.AltDirectorySeparatorChar, '.');
 
         path = Path.GetFullPath(path, Path.GetFullPath(outputPath, sourceDir));
-        path = Path.ChangeExtension(path, UIXmlExtension);
+        path = Path.ChangeExtension(path, extension);
 
         var directory = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
