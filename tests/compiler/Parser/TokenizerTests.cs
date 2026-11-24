@@ -1,7 +1,6 @@
-﻿using BluePrint.Compiler.Parser;
-using TUnit.Assertions.Enums;
+﻿using TUnit.Assertions.Enums;
 
-namespace Blueprint.Compiler.Tests;
+namespace BluePrint.Compiler.Parser;
 
 public class TokenizerTests
 {

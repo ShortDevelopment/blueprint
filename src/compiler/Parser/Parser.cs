@@ -103,7 +103,7 @@ public ref partial struct Parser()
     private string TranslationDomain()
     {
         Expect<Token.Identifier>(static x => x.Name == "translation-domain");
-        var domain = Expect<Token.Identifier>().Name;
+        var domain = Expect<Token.String>().Value;
         Expect<Token.Semicolon>();
         return domain;
     }
