@@ -89,7 +89,11 @@ file sealed class TemplateVisitor(Action<Template> action) : ISyntaxVisitor
     void ISyntaxVisitor.VisitDefault<T>(T element)
         => element.VisitChildren(this);
 
-    void ISyntaxVisitor.VisitTemplate(Template template) => action(template);
+    void ISyntaxVisitor.VisitTemplate(Template template)
+    {
+        action(template);
+        template.VisitChildren(this);
+    }
 
     public static void Visit(Document document, Action<Template> action)
     {
@@ -103,7 +107,11 @@ file sealed class ObjectLiteralVisitor(Action<ObjectLiteral> action) : ISyntaxVi
     void ISyntaxVisitor.VisitDefault<T>(T element)
         => element.VisitChildren(this);
 
-    void ISyntaxVisitor.VisitObject(ObjectLiteral @object) => action(@object);
+    void ISyntaxVisitor.VisitObject(ObjectLiteral @object)
+    {
+        action(@object);
+        @object.VisitChildren(this);
+    }
 
     public static void Visit(Template template, Action<ObjectLiteral> action)
     {
